@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="productMapper">
+
+	<select id="selectProductListAllForHome"
+		resultType="com.mycompany.myapp.checker.dto.ProductDto">
+		SELECT *
+		FROM PRODUCT
+		order by product_code asc
+	</select>
+	
+	<select id="selectProductListAll"
+		resultType="com.mycompany.myapp.checker.dto.ProductDto">
+		SELECT *
+		FROM PRODUCT
+		order by product_code desc
+	</select>
+
+	<select id="selectProductDetail"
+		resultType="com.mycompany.myapp.checker.dto.ProductDto">
+		SELECT *
+		FROM PRODUCT
+		WHERE product_code=#{product_code}
+	</select>
+	
+	<select id="selectStockListByStore"
+		resultType="com.mycompany.myapp.checker.dto.StockDetailDto">
+		select store.store_name, store.store_location, stock.stock_count
+		from product
+		LEFT OUTER JOIN stock ON product.product_code = stock.stock_pcode
+		LEFT OUTER JOIN store ON stock.stock_scode = store.store_code
+		where product.product_code = #{product_code}
+	</select>
+	
+	<insert id="insertProductStock"
+		parameterType="com.mycompany.myapp.checker.dto.ProductDto">
+		INSERT INTO product
+		(product_code, product_name, product_price, product_size, product_contents, product_stock_count, product_stock_status, product_create_date, product_store_code, product_event_status, product_event_contents, product_event_start_date, product_event_end_date, product_img) VALUES
+		(SEQ_PRODUCT.NEXTVAL, #{name}, #{price}, #{size}, #{contents}, #{stock_count}, #{stock_status}, sysdate, #{store_code}, #{event_status}, #{event_contents}, #{event_start_date}, #{event_end_date}, #{img})
+	</insert>
+	
+	
+	<delete id="deleteProductStock" parameterType="int">
+		DELETE FROM product
+		WHERE product_code = #{product_code}
+	</delete>
+	
+	
+	<update id="updateProductStock" parameterType="java.util.HashMap">
+		UPDATE product
+		SET
+		product_name = #{name},
+		product_price = #{price},
+		product_size = #{product_size, jdbcType=VARCHAR},
+		product_contents = #{contents},
+		product_stock_count = #{stock_count},
+		product_stock_status = #{stock_status},
+		product_store_code = #{store_code},
+		product_event_status = #{event_status},
+		product_event_contents = #{event_contents},
+		product_event_start_date = #{event_start_date},
+		product_event_end_date = #{event_end_date},
+		product_img = #{img}
+		WHERE product_code = #{product_code, jdbcType=NUMERIC}
+	</update>
+	
+	
+	<!-- 카트 담기 -->
+	<insert id="addCart"
+		parameterType="java.util.HashMap">
+		INSERT INTO PRODUCT_CART
+		(product_code, product_name, product_price, product_img, product_count) VALUES 
+		(tbl_cart_seq.NEXTVAL, #{product_name}, #{product_price},  #{product_img}, #{product_count})
+	</insert>
+	
+	<!-- 카트 확인 -->
+	<select id="selectCartList"
+		resultType="com.mycompany.myapp.checker.dto.CartDto">
+		SELECT product_code, product_name, product_price,  product_img, product_count
+		FROM PRODUCT_CART
+		ORDER BY product_code desc
+	</select>
+	<!-- 카트 삭제 -->
+	<delete id="cartDelete" parameterType="int">
+		DELETE FROM PRODUCT_CART
+		WHERE PRODUCT_CODE = #{product_code}
+	</delete>
+	
+	<!-- 재고 선택 조회  -->
+	<select id="searchProductList"
+		resultType="com.mycompany.myapp.checker.dto.ProductDto"
+		parameterType="java.util.HashMap">
+		SELECT *
+		FROM product
+		WHERE 1 = 1
+		<choose>
+			<when test="search_key == 'product_code'.toString()">
+				AND product_code LIKE '%'||#{search_value}||'%'
+			</when>
+			<when test="search_key == 'product_name'.toString()">
+				AND product_name LIKE '%'||#{search_value}||'%'
+			</when>
+			<when test="search_key == 'product_price'.toString()">
+				AND product_price LIKE '%'||#{search_value}||'%'
+			</when>
+		</choose>
+		ORDER BY product_code ASC
+	</select>
+	
+		<!-- home 선택 조회  -->
+	<select id="homeProductList"
+		resultType="com.mycompany.myapp.checker.dto.ProductDto"
+		parameterType="java.util.HashMap">
+		SELECT *
+		FROM product
+		WHERE 1 = 1
+		<choose>
+			<when test="'product_name'.toString()">
+				AND product_name LIKE '%'||#{search_key}||'%'
+			</when>
+		</choose>
+		ORDER BY product_code ASC
+	</select>
+</mapper>
+

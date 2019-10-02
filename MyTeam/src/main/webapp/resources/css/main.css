@@ -1,0 +1,22 @@
+@charset "UTF-8";
+
+ul {
+	list-style: none;
+}
+
+li {
+	display: inline;
+}
+
+table {
+    width: 100%;
+    border: 1px solid #444444;
+    border-collapse: collapse;
+  }
+th, td {
+  border: 1px solid #444444;
+}
+
+body {
+	background-color: grey;
+}

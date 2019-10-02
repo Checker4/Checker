@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="memberMapper">
+
+	<select id="selectMemberListAll"
+		resultType="com.mycompany.myapp.checker.dto.MemberDto">
+		SELECT *
+		FROM Member
+		order by member_code desc
+	</select>
+
+	<select id="selectMemberDetail"
+		resultType="com.mycompany.myapp.checker.dto.MemberDto">
+		SELECT *
+		FROM Member
+		WHERE member_code=#{member_code}
+	</select>
+	
+	<select id="memberIdDoubleCheck"
+		resultType="java.lang.Integer">
+		select count(*)
+		from member
+		where member_id = #{member_id}
+	</select>
+	
+	
+	<select id="memberLoginCheck"
+		resultType="java.lang.Integer">
+		select count(*)
+		from member
+		where member_id = #{id} and member_password = #{pwd}
+	</select>
+	
+	<insert id="insertMemberManagement"
+		parameterType="com.mycompany.myapp.checker.dto.MemberDto">
+		INSERT INTO Member
+		(member_code, member_id, member_password, member_name, member_phone, member_email, member_create_date, member_buy_code, member_level) VALUES
+<!-- 		<choose> -->
+<!-- 			<when test="buy_code == null and buy_code == ''"> -->
+<!-- 				(SEQ_MEMBER.NEXTVAL, #{id}, #{password}, #{name}, #{phone}, #{email}, sysdate, '0', 'Customer') -->
+<!-- 			</when> -->
+<!-- 			<when test="buy_code != null and buy_code != ''"> -->
+<!-- 				(SEQ_MEMBER.NEXTVAL, #{id}, #{password}, #{name}, #{phone}, #{email}, sysdate, #{buy_code}, 'Customer') -->
+<!-- 			</when> -->
+<!-- 		</choose> -->
+		(SEQ_MEMBER.NEXTVAL, #{id}, #{password}, #{name}, #{phone}, #{email}, sysdate, '0', 'Customer')
+	</insert>
+	
+	
+	<delete id="deleteMemberManagement" parameterType="int">
+		DELETE FROM Member
+		WHERE member_code = #{member_code}
+	</delete>
+	
+	
+	<update id="updateMemberManagement" parameterType="java.util.HashMap">
+		UPDATE Member
+		SET
+		member_id = #{id},
+		member_name = #{name},
+		member_phone = #{phone},
+		member_email = #{email},
+		member_buy_code = #{buy_code},
+		member_level = #{level}
+		WHERE member_code = #{member_code}
+	</update>
+	
+	<select id="searchMemberList2"
+		resultType="com.mycompany.myapp.checker.dto.MemberDto"
+		parameterType="java.util.HashMap">
+		SELECT *
+		FROM member
+		WHERE 1 = 1
+		<choose>
+<!-- 			<when test="member_code != null and member_code != ''"> -->
+<!-- 				AND #{search_key} LIKE '%'||#{search_value}||'%' -->
+<!-- 			</when> -->
+			<when test="search_key != null and search_key != ''">
+				AND #{search_key} LIKE '%'||#{search_value}||'%'
+			</when>
+		</choose>
+		ORDER BY member_code ASC
+	</select>
+
+	<select id="searchMemberList3"
+		resultType="com.mycompany.myapp.checker.dto.MemberDto"
+		parameterType="java.util.HashMap">
+		SELECT *
+		FROM member
+<!-- 		WHERE member_id LIKE '%'||#{search_value}||'%' -->
+		WHERE #{search_key} LIKE '%'||#{search_value}||'%'
+		ORDER BY member_code ASC
+	</select>
+	
+	<select id="searchMemberList"
+		resultType="com.mycompany.myapp.checker.dto.MemberDto"
+		parameterType="java.util.HashMap">
+		SELECT *
+		FROM member
+		WHERE 1 = 1
+		<choose>
+			<when test="search_key == 'member_code'.toString()">
+				AND member_code LIKE '%'||#{search_value}||'%'
+			</when>
+			<when test="search_key == 'member_id'.toString()">
+				AND member_id LIKE '%'||#{search_value}||'%'
+			</when>
+			<when test="search_key == 'member_name'.toString()">
+				AND member_name LIKE '%'||#{search_value}||'%'
+			</when>
+			<when test="search_key == 'member_phone'.toString()">
+				AND member_phone LIKE '%'||#{search_value}||'%'
+			</when>
+			<when test="search_key == 'member_email'.toString()">
+				AND member_email LIKE '%'||#{search_value}||'%'
+			</when>
+			<when test="search_key == 'member_buy_code'.toString()">
+				AND member_buy_code LIKE '%'||#{search_value}||'%'
+			</when>
+			<when test="search_key == 'member_level'.toString()">
+				AND member_level LIKE '%'||#{search_value}||'%'
+			</when>
+		</choose>
+		ORDER BY member_code ASC
+	</select>
+	
+	
+</mapper>
+
